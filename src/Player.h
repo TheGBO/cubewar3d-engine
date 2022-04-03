@@ -2,8 +2,10 @@
  
 class Player : public GameEntity{
 public:
-    Player(float x, float y, float z, float s):GameEntity(x,y,z,s){}
+    Player(float x, float y, float z, float s):GameEntity(x,y,z,s){
+        setColor(1,0.1,0.5);
+    }
     void tick(){
-        offSet(0.0001,0.0001,0.005);
+        offSet(.0001,.0001,.001);
     }
 };

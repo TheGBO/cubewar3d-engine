@@ -14,6 +14,10 @@ public:
     float z = 0;
     float s = 0;
 public:
+    float r = 0;
+    float g = 0;
+    float b = 0;
+public:
     GameEntity(float x, float y, float z, float s){
         this->x = x;
         this->y = y;
@@ -25,11 +29,19 @@ public:
 
     }
 
+    void setColor(float r, float g, float b){
+        this->r = r;
+        this->g = g;
+        this->b = b;
+        cout << "DEBUG::COLOR HAS BEEN SET " << r << ", " << g << ", " << b << endl;
+    }
+
     void render(){
         glPushMatrix();
-        glColor3f(1,1,1);
+        glColor3f(this->r,this->g,this->b);
         glTranslatef(this->x,this->y,this->z);
         glutSolidCube(this->s);
+        glutSolidTeapot(5);
         glPopMatrix();
     }
 

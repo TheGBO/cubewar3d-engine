@@ -59,11 +59,9 @@ void init(){
 
 	// Set lighting intensity and color
 	GLfloat qaAmbientLight[]	= {0.2, 0.2, 0.2, 1.0};
-	GLfloat qaDiffuseLight[]	= {0.8, 0.8, 0.8, 1.0};
-	GLfloat qaSpecularLight[]	= {1.0, 1.0, 1.0, 1.0};
+    glEnable(GL_COLOR_MATERIAL);
 	glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
-	glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
-	glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
+
 
 	// Set the light position
 	GLfloat qaLightPosition[]	= {.5, .5, 0.0, 1.0};
