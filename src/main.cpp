@@ -1,4 +1,5 @@
 #include "GameEntity.h"
+#include "Player.h"
 #include <windows.h>
 
 using namespace std;
@@ -7,7 +8,7 @@ vector<GameEntity*> entities;
 int oldTimeSinceStart = 0;
 
 //This section instatiate the Game Entities
-GameEntity *e = new GameEntity(1,1,1,0.4);
+Player *e = new Player(0,0,0,0.4);
 //adding the entities to the Vector, so they can be renderer and updated
 void run(){
     entities.push_back(e);
@@ -19,7 +20,7 @@ void logic(){
     int deltaTime = timeSinceStart - oldTimeSinceStart;
     oldTimeSinceStart = timeSinceStart;
     for(GameEntity *e : entities){
-        e->tick();
+       e->tick();
     }
     glutPostRedisplay();
 }
@@ -51,6 +52,22 @@ void init(){
     gluPerspective(35,1,0.1f,1000);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_DEPTH_TEST);
+    // Lighting set up
+	glLightModeli(GL_LIGHT_MODEL_LOCAL_VIEWER, GL_TRUE);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+
+	// Set lighting intensity and color
+	GLfloat qaAmbientLight[]	= {0.2, 0.2, 0.2, 1.0};
+	GLfloat qaDiffuseLight[]	= {0.8, 0.8, 0.8, 1.0};
+	GLfloat qaSpecularLight[]	= {1.0, 1.0, 1.0, 1.0};
+	glLightfv(GL_LIGHT0, GL_AMBIENT, qaAmbientLight);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, qaDiffuseLight);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, qaSpecularLight);
+
+	// Set the light position
+	GLfloat qaLightPosition[]	= {.5, .5, 0.0, 1.0};
+	glLightfv(GL_LIGHT0, GL_POSITION, qaLightPosition);
     //skybox color
     glClearColor(0.4f,0.4f,0.7f,1);
 }

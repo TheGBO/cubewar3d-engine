@@ -21,7 +21,9 @@ public:
         this->s = s;
     }
 
-    virtual void tick();
+    virtual void tick(){
+
+    }
 
     void render(){
         glPushMatrix();
