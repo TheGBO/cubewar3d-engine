@@ -8,9 +8,8 @@ using namespace std;
 
 vector<GameEntity*> entities;
 int oldTimeSinceStart = 0;
-float cameraAngle = 0;
 //This section instatiate the Game Entities
-Player *player = new Player(-10,0,0,5);
+Player *player = new Player(-20,30,0,5);
 Ground *ground = new Ground(0,-2.5,0,10);
 //adding the entities to the Vector, so they can be renderer and updated
 void run(){
@@ -27,16 +26,22 @@ void logic(){
        e->tick();
        e->getEntityList(entities);
     }
-    cameraAngle += 0.005f;
     glutPostRedisplay();
 }
 
+int frame=0,time,timebase=0;
 //rendering entities
 void display(){
+    frame++;
+	time=glutGet(GLUT_ELAPSED_TIME);
+	if (time - timebase > 1000) {
+		cout << "FPS:" << frame*1000.0/(time-timebase) << endl;
+		timebase = time;
+		frame = 0;
+	}
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    glRotatef(180,0,1,0);
-    glTranslatef(cameraAngle/2,-13,50);
+    glTranslatef(-player->x,-13,-50-player->z);
     for (GameEntity *e : entities)
     {
         e->render();
