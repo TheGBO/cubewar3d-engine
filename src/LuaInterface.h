@@ -16,5 +16,7 @@ bool CheckLua(lua_State*, int);
 
 int luaDrawQuad(lua_State* L);
 int luaSetDrawColor(lua_State* L);
-
+int luaTranslate(lua_State* L);
+int luaRotate(lua_State* L);
+int luaSolidCube(lua_State* L);
 #endif

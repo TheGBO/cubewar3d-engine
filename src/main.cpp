@@ -14,6 +14,9 @@ void run(){
     //use this section to define runtime enviroment functions
     lua_register(L, "drawQuad", luaDrawQuad);
     lua_register(L, "setDrawColor", luaSetDrawColor);
+    lua_register(L, "translate", luaTranslate);
+    lua_register(L, "solidCube", luaSolidCube);
+
     //add entities with "entities.push_back(entity)"
     if(CheckLua(L, luaL_dofile(L, "game/script.lua"))){
         lua_getglobal(L, "Entities");
@@ -63,8 +66,11 @@ void display(){
     glLoadIdentity();
     glTranslatef(0,-13,-50);
     //renderCallback
+
+    glPushMatrix();
     luaEntityCallback("Render");
-    
+    glPopMatrix();
+
     glutSwapBuffers();
 }
 

@@ -29,3 +29,34 @@ int luaSetDrawColor(lua_State* L){
     return 0;
 }
 
+int luaTranslate(lua_State* L){
+    float x = lua_tonumber(L, 1);
+    float y = lua_tonumber(L, 2);
+    float z = lua_tonumber(L, 3);
+
+    glTranslatef(x,y,z);
+    return 0;
+}
+
+int luaRotate(lua_State* L){
+    float a = lua_tonumber(L, 1);
+    float x = lua_tonumber(L, 2);
+    float y = lua_tonumber(L, 3);
+    float z = lua_tonumber(L, 3);
+
+    glRotatef(a,x,y,z);
+    return 0;
+}
+
+
+int luaSolidCube(lua_State* L){
+    float x = lua_tonumber(L, 1);
+    float y = lua_tonumber(L, 2);
+    float z = lua_tonumber(L, 3);
+    float s = lua_tonumber(L, 4);
+    glTranslatef(x,y,z);
+    glutSolidCube(s);
+    return 0;
+}
+
+
