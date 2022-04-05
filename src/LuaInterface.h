@@ -15,5 +15,6 @@ extern "C"{
 bool CheckLua(lua_State*, int);
 
 int luaDrawQuad(lua_State* L);
+int luaSetDrawColor(lua_State* L);
 
 #endif

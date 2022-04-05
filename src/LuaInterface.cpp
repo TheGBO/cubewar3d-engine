@@ -19,3 +19,13 @@ int luaDrawQuad(lua_State* L){
     drawQuad(x,y,z,s);
     return 0;
 }
+
+int luaSetDrawColor(lua_State* L){
+    float r = lua_tonumber(L, 1);
+    float g = lua_tonumber(L, 2);
+    float b = lua_tonumber(L, 3);
+
+    glColor3f(r,g,b);
+    return 0;
+}
+

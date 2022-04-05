@@ -1,10 +1,8 @@
-#include "GameEntity.h"
 #include <windows.h>
 #include "LuaInterface.h"
 
 using namespace std;
 
-vector<GameEntity*> entities;
 int oldTimeSinceStart = 0;
 
 //initialize lua VM
@@ -13,32 +11,31 @@ lua_State *L = luaL_newstate();
 //adding the entities to the Vector, so they can be renderer and updated
 void run(){
     luaL_openlibs(L);
+    //use this section to define runtime enviroment functions
     lua_register(L, "drawQuad", luaDrawQuad);
+    lua_register(L, "setDrawColor", luaSetDrawColor);
     //add entities with "entities.push_back(entity)"
     if(CheckLua(L, luaL_dofile(L, "game/script.lua"))){
-        lua_getglobal(L, "entity");
-        if(lua_istable(L, -1)){
-            GameEntity *e = new GameEntity(0,0,0);
-
-            lua_pushstring(L, "x");
-            lua_gettable(L, -2);
-            e->x = lua_tonumber(L, -1);
-            lua_pop(L, 1);
-
-            lua_pushstring(L, "y");
-            lua_gettable(L, -2);
-            e->y = lua_tonumber(L, -1);
-            lua_pop(L, 1);
-
-            lua_pushstring(L, "z");
-            lua_gettable(L, -2);
-            e->z = lua_tonumber(L, -1);
-            lua_pop(L, 1);
-
-            entities.push_back(e);
-        }
+        lua_getglobal(L, "Entities");
     }
     //lua_close(L);
+}
+
+void luaEntityCallback(string name){
+    lua_getglobal(L, "Entities");
+    int entLen = lua_rawlen(L, -1);
+    for (int i = 0; i < entLen+1; i++)
+    {
+        if(!lua_isnil(L, -1)){
+            lua_pushnumber(L, i);
+            lua_gettable(L, -2);
+            lua_getfield(L, -1, name.c_str());
+            if(lua_isfunction(L, -1)){
+                CheckLua(L, lua_pcall(L, 0, 0, 0));
+            }
+        }
+        lua_pop(L, 1);
+    }
 }
 
 //this function updates the entities
@@ -46,10 +43,9 @@ void logic(){
     int timeSinceStart = glutGet(GLUT_ELAPSED_TIME);
     int deltaTime = timeSinceStart - oldTimeSinceStart;
     oldTimeSinceStart = timeSinceStart;
-    for(GameEntity *e : entities){
-       e->tick();
-       e->getEntityList(entities);
-    }
+
+    luaEntityCallback("Tick");
+
     glutPostRedisplay();
 }
 
@@ -66,33 +62,19 @@ void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     glTranslatef(0,-13,-50);
-    
-    for (GameEntity *e : entities)
-    {
-        e->render();
-    }
-
-    lua_getglobal(L, "model");
-    if(lua_isfunction(L, -1)){
-        CheckLua(L, lua_pcall(L, 0, 0, 0));
-    }
+    //renderCallback
+    luaEntityCallback("Render");
     
     glutSwapBuffers();
 }
 
 //TODO: add keyboard input handler
 void keyboardDown(unsigned char key, int x, int y){
-    for (GameEntity *e : entities)
-    {
-        e->keyboardDown(key);
-    }
+    
 }
 
 void keyboardUp(unsigned char key, int x, int y){
-    for (GameEntity *e : entities)
-    {
-        e->keyboardUp(key);
-    }
+    
 }
 
 //initializing the engine
