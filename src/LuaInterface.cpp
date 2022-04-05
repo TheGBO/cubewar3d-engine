@@ -42,7 +42,7 @@ int luaRotate(lua_State* L){
     float a = lua_tonumber(L, 1);
     float x = lua_tonumber(L, 2);
     float y = lua_tonumber(L, 3);
-    float z = lua_tonumber(L, 3);
+    float z = lua_tonumber(L, 4);
 
     glRotatef(a,x,y,z);
     return 0;

@@ -1,5 +1,5 @@
 --get player
-require("game.player")
+require("gameAssets.player")
 
 --setup Entity List
 Entities = {}

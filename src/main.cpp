@@ -5,6 +5,20 @@ using namespace std;
 
 int oldTimeSinceStart = 0;
 
+bool pressedKeys[255];
+
+int LuaIsKeyDown(lua_State* L){
+    char key = lua_tostring(L, 1)[0];
+    bool result = false;
+    if(pressedKeys[key] == true){
+        result = true;
+    } 
+    else {
+        result == false;
+    }
+    lua_pushboolean(L, result);
+    return 1;
+}
 //initialize lua VM
 lua_State *L = luaL_newstate();
 //This section instatiate the Game Entities
@@ -15,12 +29,17 @@ void run(){
     lua_register(L, "drawQuad", luaDrawQuad);
     lua_register(L, "setDrawColor", luaSetDrawColor);
     lua_register(L, "translate", luaTranslate);
+    lua_register(L, "rotate", luaRotate);
     lua_register(L, "solidCube", luaSolidCube);
+    lua_register(L, "isKeyDown", LuaIsKeyDown);
 
     //add entities with "entities.push_back(entity)"
-    if(CheckLua(L, luaL_dofile(L, "game/script.lua"))){
-        lua_getglobal(L, "Entities");
+    if(CheckLua(L, luaL_dofile(L, "gameAssets/script.lua"))){
+        cout << "Loaded Game Scripting succesfull at the first try!" << endl;
+    }else{
+        cout << "Loading Game Scripting failed!" << endl;
     }
+    lua_getglobal(L, "Entities");
     //lua_close(L);
 }
 
@@ -34,7 +53,13 @@ void luaEntityCallback(string name){
             lua_gettable(L, -2);
             lua_getfield(L, -1, name.c_str());
             if(lua_isfunction(L, -1)){
+                if(name.compare("Render")){
+                    glPushMatrix();
+                }
                 CheckLua(L, lua_pcall(L, 0, 0, 0));
+                if(name.compare("Render")){
+                    glPopMatrix();
+                }
             }
         }
         lua_pop(L, 1);
@@ -57,6 +82,7 @@ int frame=0,time,timebase=0;
 void display(){
     frame++;
 	time=glutGet(GLUT_ELAPSED_TIME);
+    
 	if (time - timebase > 1000) {
 		//cout << "FPS:" << frame*1000.0/(time-timebase) << endl;
 		timebase = time;
@@ -66,31 +92,29 @@ void display(){
     glLoadIdentity();
     glTranslatef(0,-13,-50);
     //renderCallback
-
-    glPushMatrix();
+    
     luaEntityCallback("Render");
-    glPopMatrix();
 
     glutSwapBuffers();
 }
 
 //TODO: add keyboard input handler
 void keyboardDown(unsigned char key, int x, int y){
-    
+    pressedKeys[key] = true;
 }
 
 void keyboardUp(unsigned char key, int x, int y){
-    
+    pressedKeys[key] = false;
 }
+
 
 //initializing the engine
 void init(){
     run();
-    //3d mode
     
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(70,(double)(800/600),0.1f,1000);
+    gluPerspective(70,1.3,0.1f,1000);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_DEPTH_TEST);
     // Lighting set up
