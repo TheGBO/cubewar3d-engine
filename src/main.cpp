@@ -1,20 +1,44 @@
 #include "GameEntity.h"
 #include <windows.h>
-
-#include "game/Player.h"
-#include "game/Ground.h"
+#include "LuaInterface.h"
 
 using namespace std;
 
 vector<GameEntity*> entities;
 int oldTimeSinceStart = 0;
+
+//initialize lua VM
+lua_State *L = luaL_newstate();
 //This section instatiate the Game Entities
-Player *player = new Player(-20,30,0,5);
-Ground *ground = new Ground(0,-2.5,0,10);
 //adding the entities to the Vector, so they can be renderer and updated
 void run(){
-    entities.push_back(ground);
-    entities.push_back(player);
+    luaL_openlibs(L);
+    lua_register(L, "drawQuad", luaDrawQuad);
+    //add entities with "entities.push_back(entity)"
+    if(CheckLua(L, luaL_dofile(L, "game/script.lua"))){
+        lua_getglobal(L, "entity");
+        if(lua_istable(L, -1)){
+            GameEntity *e = new GameEntity(0,0,0);
+
+            lua_pushstring(L, "x");
+            lua_gettable(L, -2);
+            e->x = lua_tonumber(L, -1);
+            lua_pop(L, 1);
+
+            lua_pushstring(L, "y");
+            lua_gettable(L, -2);
+            e->y = lua_tonumber(L, -1);
+            lua_pop(L, 1);
+
+            lua_pushstring(L, "z");
+            lua_gettable(L, -2);
+            e->z = lua_tonumber(L, -1);
+            lua_pop(L, 1);
+
+            entities.push_back(e);
+        }
+    }
+    //lua_close(L);
 }
 
 //this function updates the entities
@@ -35,16 +59,22 @@ void display(){
     frame++;
 	time=glutGet(GLUT_ELAPSED_TIME);
 	if (time - timebase > 1000) {
-		cout << "FPS:" << frame*1000.0/(time-timebase) << endl;
+		//cout << "FPS:" << frame*1000.0/(time-timebase) << endl;
 		timebase = time;
 		frame = 0;
 	}
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    glTranslatef(-player->x,-13,-50-player->z);
+    glTranslatef(0,-13,-50);
+    
     for (GameEntity *e : entities)
     {
         e->render();
+    }
+
+    lua_getglobal(L, "model");
+    if(lua_isfunction(L, -1)){
+        CheckLua(L, lua_pcall(L, 0, 0, 0));
     }
     
     glutSwapBuffers();

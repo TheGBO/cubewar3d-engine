@@ -6,7 +6,7 @@
 #include <GL/glu.h>
 #include <vector>
 //simple quad
-void drawQuad(float posX, float posY, float posZ, float scale){
+inline void drawQuad(float posX, float posY, float posZ, float scale){
     glBegin(GL_QUADS);
     glVertex3f(posX+scale, posY+scale, posZ);
     glVertex3f(posX-scale, posY+scale, posZ);

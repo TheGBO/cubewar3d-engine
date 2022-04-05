@@ -10,22 +10,27 @@ using namespace std;
 class GameEntity
 {
 public:
+//position vars
     float x = 0;
     float y = 0;
     float z = 0;
-    float s = 0;
 public:
+//size vars
+    float sX = 1;
+    float sY = 1;
+    float sZ = 1;
+public:
+//rotation vars
     float rotX = 0;
     float rotY = 0;
     float rotZ = 0;
     float rotAngle = 0;
 
 public:
-    GameEntity(float x, float y, float z, float s){    
+    GameEntity(float x, float y, float z){    
         this->x = x;
         this->y = y;
         this->z = z;
-        this->s = s;
     }
 
     virtual void tick(){
