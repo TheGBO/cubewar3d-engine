@@ -1,17 +1,21 @@
 #include "GameEntity.h"
-#include "Player.h"
 #include <windows.h>
+
+#include "game/Player.h"
+#include "game/Ground.h"
 
 using namespace std;
 
 vector<GameEntity*> entities;
 int oldTimeSinceStart = 0;
-
+float cameraAngle = 0;
 //This section instatiate the Game Entities
-Player *e = new Player(0,0,0,0.4);
+Player *player = new Player(-10,0,0,5);
+Ground *ground = new Ground(0,-2.5,0,10);
 //adding the entities to the Vector, so they can be renderer and updated
 void run(){
-    entities.push_back(e);
+    entities.push_back(ground);
+    entities.push_back(player);
 }
 
 //this function updates the entities
@@ -21,7 +25,9 @@ void logic(){
     oldTimeSinceStart = timeSinceStart;
     for(GameEntity *e : entities){
        e->tick();
+       e->getEntityList(entities);
     }
+    cameraAngle += 0.005f;
     glutPostRedisplay();
 }
 
@@ -29,7 +35,8 @@ void logic(){
 void display(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    glTranslatef(0,0,-50);
+    glRotatef(180,0,1,0);
+    glTranslatef(cameraAngle/2,-13,50);
     for (GameEntity *e : entities)
     {
         e->render();
@@ -39,17 +46,28 @@ void display(){
 }
 
 //TODO: add keyboard input handler
-void keyboard(unsigned char key, int x, int y){
-    
+void keyboardDown(unsigned char key, int x, int y){
+    for (GameEntity *e : entities)
+    {
+        e->keyboardDown(key);
+    }
+}
+
+void keyboardUp(unsigned char key, int x, int y){
+    for (GameEntity *e : entities)
+    {
+        e->keyboardUp(key);
+    }
 }
 
 //initializing the engine
 void init(){
     run();
     //3d mode
+    
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(35,1,0.1f,1000);
+    gluPerspective(70,(double)(800/600),0.1f,1000);
     glMatrixMode(GL_MODELVIEW);
     glEnable(GL_DEPTH_TEST);
     // Lighting set up
@@ -76,7 +94,8 @@ int main(int argc, char **argv){
     glutInitDisplayMode(GLUT_DOUBLE);
     glutInitWindowSize(800,600);
     glutCreateWindow("Game");
-    glutKeyboardFunc(keyboard);
+    glutKeyboardFunc(keyboardDown);
+    glutKeyboardUpFunc(keyboardUp);
     glutDisplayFunc(display);
     glutIdleFunc(logic);
     init();

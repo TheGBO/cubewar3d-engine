@@ -4,6 +4,7 @@
 #include <GL/freeglut.h>
 #include <iostream>
 #include <GL/glu.h>
+#include <math.h>
 #include <vector>
 using namespace std;
 class GameEntity
@@ -14,11 +15,13 @@ public:
     float z = 0;
     float s = 0;
 public:
-    float r = 0;
-    float g = 0;
-    float b = 0;
+    float rotX = 0;
+    float rotY = 0;
+    float rotZ = 0;
+    float rotAngle = 0;
+
 public:
-    GameEntity(float x, float y, float z, float s){
+    GameEntity(float x, float y, float z, float s){    
         this->x = x;
         this->y = y;
         this->z = z;
@@ -29,19 +32,22 @@ public:
 
     }
 
-    void setColor(float r, float g, float b){
-        this->r = r;
-        this->g = g;
-        this->b = b;
-        cout << "DEBUG::COLOR HAS BEEN SET " << r << ", " << g << ", " << b << endl;
+    virtual void model(){
+
+    }
+
+    virtual void keyboardDown(unsigned char key){
+
+    }
+    virtual void keyboardUp(unsigned char key){
+
     }
 
     void render(){
         glPushMatrix();
-        glColor3f(this->r,this->g,this->b);
         glTranslatef(this->x,this->y,this->z);
-        glutSolidCube(this->s);
-        glutSolidTeapot(5);
+        glRotatef(this->rotAngle, this->rotX, this->rotY, this->rotZ);
+        model();
         glPopMatrix();
     }
 
@@ -49,6 +55,17 @@ public:
         this->x += x;
         this->y += y;
         this->z += z;
+    }
+
+    void rotate(float a, float x, float y, float z){
+        this->rotAngle = fmod(a, 360);
+        this->rotX = x;
+        this->rotY = y;
+        this->rotZ = z;
+    }
+
+    virtual void getEntityList(vector<GameEntity*> list){
+        
     }
 };
 
