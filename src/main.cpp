@@ -4,10 +4,13 @@
 using namespace std;
 
 int oldTimeSinceStart = 0;
+int cameraX;
+int cameraY = -20;
+int cameraZ = -50;
 
 bool pressedKeys[255];
 
-int LuaIsKeyDown(lua_State* L){
+int luaIsKeyDown(lua_State* L){
     char key = lua_tostring(L, 1)[0];
     bool result = false;
     if(pressedKeys[key] == true){
@@ -18,6 +21,19 @@ int LuaIsKeyDown(lua_State* L){
     }
     lua_pushboolean(L, result);
     return 1;
+}
+
+int luaSetCameraPosition(lua_State* L){
+    float x = lua_tonumber(L, 1);
+    float y = lua_tonumber(L, 2);
+    float z = lua_tonumber(L, 3);
+
+    cameraX = x;
+    cameraY = y;
+    cameraZ = z;
+    
+
+    return 0;
 }
 //initialize lua VM
 lua_State *L = luaL_newstate();
@@ -31,7 +47,8 @@ void run(){
     lua_register(L, "translate", luaTranslate);
     lua_register(L, "rotate", luaRotate);
     lua_register(L, "solidCube", luaSolidCube);
-    lua_register(L, "isKeyDown", LuaIsKeyDown);
+    lua_register(L, "setCameraPosition", luaSetCameraPosition);
+    lua_register(L, "isKeyDown", luaIsKeyDown);
 
     //add entities with "entities.push_back(entity)"
     if(CheckLua(L, luaL_dofile(L, "gameAssets/script.lua"))){
@@ -53,13 +70,9 @@ void luaEntityCallback(string name){
             lua_gettable(L, -2);
             lua_getfield(L, -1, name.c_str());
             if(lua_isfunction(L, -1)){
-                if(name.compare("Render")){
-                    glPushMatrix();
-                }
+                glPushMatrix();
                 CheckLua(L, lua_pcall(L, 0, 0, 0));
-                if(name.compare("Render")){
-                    glPopMatrix();
-                }
+                glPopMatrix();
             }
         }
         lua_pop(L, 1);
@@ -90,10 +103,11 @@ void display(){
 	}
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
-    glTranslatef(0,-13,-50);
-    //renderCallback
+    glTranslatef(cameraX,cameraY,cameraZ);
+    
     
     luaEntityCallback("Render");
+    
 
     glutSwapBuffers();
 }

@@ -7,6 +7,7 @@ Player = {
 }
 
 function Player:Tick()
+    setCameraPosition(-Player.x,Player.y-15,-Player.z-50)
     if isKeyDown("d") then
         Player.a = Player.a - 0.1
     end
@@ -25,8 +26,6 @@ end
 
 function Player:Render()
     setDrawColor(1,0.5,0)
-    translate(Player.x,Player.y,Player.z)
-    rotate(Player.a,0,1,0)
     solidCube(0,0,0,Player.s)
     setDrawColor(0,0,0)
     drawQuad(-3,0,Player.s/1.85,1)
